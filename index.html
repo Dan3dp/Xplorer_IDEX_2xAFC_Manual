@@ -77,7 +77,7 @@
             scene.background = new THREE.Color(0xfcfcfc); 
 
             // FIX: Near plane changed to 0.001 to allow extreme zooming
-            camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 0.001, 2000);
+            camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 0.01, 1000);
             
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth - 340, window.innerHeight);
