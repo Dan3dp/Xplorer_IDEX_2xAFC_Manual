@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Light Studio CAD Manual</title>
+    <title>Pro Studio CAD Manual</title>
     <style>
         :root { 
             --accent: #2563eb; 
-            --bg: #ffffff; /* Main Background */
-            --sidebar: #f8fafc; /* Light Sidebar */
+            --bg: #ffffff; 
+            --sidebar: #f8fafc; 
             --text: #1e293b; 
             --subtext: #64748b;
         }
         
-        body { margin: 0; display: flex; height: 100vh; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+        body { margin: 0; display: flex; height: 100vh; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
         
         .sidebar { 
             width: 340px; 
@@ -41,8 +41,8 @@
             font-weight: bold; 
             transition: 0.2s; 
         }
-        button:hover { background: #1d4ed8; transform: translateY(-1px); }
-        button:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; transform: none; }
+        button:hover { background: #1d4ed8; }
+        button:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; }
 
         #container { flex-grow: 1; position: relative; outline: none; }
         .hint { 
@@ -51,11 +51,10 @@
             right: 20px; 
             font-size: 11px; 
             color: #94a3b8; 
-            background: rgba(255,255,255,0.8); 
+            background: rgba(255,255,255,0.9); 
             padding: 5px 12px; 
             border: 1px solid #e2e8f0;
             border-radius: 20px; 
-            pointer-events: none; 
         }
     </style>
 </head>
@@ -74,7 +73,7 @@
     </div>
 
     <div id="container">
-        <div class="hint">Left Click: CAD Rotate | Right Click: Pan | Scroll: Zoom</div>
+        <div class="hint">CAD Rotate (Left) | Pan (Right) | Zoom (Scroll)</div>
     </div>
 
     <script type="importmap">
@@ -95,7 +94,7 @@
             {
                 num: "Step 01",
                 title: "Y-Axis Beam",
-                desc: "Place the MGN linear rail on the extrusion. Ensure the T-nuts are aligned.",
+                desc: "Place the MGN linear rail on the extrusion.",
                 file: "100_01__Beam_MGN_Y_Axis__asmbl___V1.glb"
             },
             {
@@ -114,24 +113,40 @@
 
         function init() {
             scene = new THREE.Scene();
-            
-            // --- LIGHT BACKGROUND COLOR ---
-            scene.background = new THREE.Color(0xf1f5f9); // Light blue-grey
-            // You can also use 0xffffff for pure white
+            scene.background = new THREE.Color(0xfcfcfc); 
 
             camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 0.1, 1000);
-            camera.position.set(2, 2, 2);
+            camera.position.set(3, 3, 3);
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth - 340, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
+            
+            // Enable physically correct lighting
+            renderer.toneMapping = THREE.ReinhardToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            
             document.getElementById('container').appendChild(renderer.domElement);
 
-            // Brightened lighting for a white background
-            const sun = new THREE.DirectionalLight(0xffffff, 2.5);
-            sun.position.set(5, 10, 7.5);
-            scene.add(sun);
-            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            // --- THE BETTER LIGHTING (Three-Point Setup) ---
+            
+            // 1. Key Light: High intensity from the front-side
+            const keyLight = new THREE.DirectionalLight(0xffffff, 2);
+            keyLight.position.set(5, 10, 5);
+            scene.add(keyLight);
+
+            // 2. Fill Light: Softer light from the opposite side to fill shadows
+            const fillLight = new THREE.DirectionalLight(0xffffff, 1);
+            fillLight.position.set(-5, 5, 2);
+            scene.add(fillLight);
+
+            // 3. Back Light: Adds a "rim" highlight to separate model from background
+            const backLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            backLight.position.set(0, -5, -5);
+            scene.add(backLight);
+
+            // 4. Ambient Light: General room light for even coverage
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
             controls = new ArcballControls(camera, renderer.domElement, scene);
             controls.setGizmosVisible(false);
@@ -145,7 +160,6 @@
 
         function loadModel(url) {
             if (currentModel) scene.remove(currentModel);
-
             loader.load(url, (gltf) => {
                 currentModel = gltf.scene;
                 const box = new THREE.Box3().setFromObject(currentModel);
