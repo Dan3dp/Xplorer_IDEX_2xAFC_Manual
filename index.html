@@ -1,26 +1,132 @@
-<style>
-  .manual-container { display: flex; height: 100vh; }
-  .instructions { width: 30%; padding: 20px; overflow-y: auto; border-right: 1px solid #ccc; }
-  .viewer-side { width: 70%; position: relative; }
-  model-viewer { width: 100%; height: 100%; }
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Assembly Manual</title>
+    
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
-<div class="manual-container">
-  <div class="instructions">
-    <h2>Step 1: The Base</h2>
-    <p>Take the main frame and insert the M3 screws into the bottom slots.</p>
-    <button onclick="changeModel('step2.glb', 'Step 2: Motors')">Next Step</button>
-  </div>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
 
-  <div class="viewer-side">
-    <model-viewer id="manual-view" src="step1.glb" camera-controls auto-rotate></model-viewer>
-  </div>
-</div>
+        /* Left Side: Instructions */
+        .sidebar {
+            width: 350px;
+            padding: 40px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 10;
+            overflow-y: auto;
+        }
 
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-<script>
-  function changeModel(fileName, stepTitle) {
-    document.getElementById('manual-view').src = fileName;
-    document.querySelector('h2').innerText = stepTitle;
-  }
-</script>
+        .step-number {
+            font-weight: bold;
+            color: #3b82f6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            margin-top: 10px;
+            font-size: 24px;
+            color: #1a1a1a;
+        }
+
+        p {
+            line-height: 1.6;
+            color: #4b5563;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #3b82f6;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        /* Right Side: 3D Model */
+        .viewer-container {
+            flex-grow: 1;
+            position: relative;
+            background: radial-gradient(#ffffff, #d1d5db);
+        }
+
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            --progress-bar-color: #3b82f6;
+        }
+
+        .help-text {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: #9ca3af;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <span class="step-number">Step 01</span>
+        <h1>Y-Axis Beam Assembly</h1>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        
+        <p>
+            Welcome to the interactive manual. Use your mouse to rotate the model on the right. 
+            Scroll to zoom in on specific details of the assembly.
+        </p>
+        
+        <p>
+            <strong>Instructions:</strong> Prepare the aluminum extrusion and ensure the 
+            MGN linear rail is centered before tightening the M3 bolts.
+        </p>
+
+        <div class="controls">
+            <button disabled style="background: #ccc;">Previous</button>
+            <button onclick="alert('Add more .glb files to enable next steps!')">Next Step</button>
+        </div>
+    </div>
+
+    <div class="viewer-container">
+        <model-viewer 
+            src="100_01__Beam_MGN_Y_Axis__asmbl___V1.glb" 
+            alt="3D CAD Model of Y-Axis Beam"
+            camera-controls 
+            auto-rotate 
+            shadow-intensity="1" 
+            environment-image="neutral"
+            exposure="1">
+            
+            <div slot="poster" style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                <p>Loading 3D Model...</p>
+            </div>
+        </model-viewer>
+
+        <div class="help-text">Left Click: Rotate | Scroll: Zoom | Right Click: Pan</div>
+    </div>
+
+</body>
+</html>
