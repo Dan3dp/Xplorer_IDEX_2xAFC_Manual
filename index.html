@@ -64,4 +64,121 @@
             flex: 1;
             padding: 12px;
             border: none;
-            border-radius:
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        /* Right Side: 3D Model */
+        .viewer-container {
+            flex-grow: 1;
+            background: radial-gradient(circle, #ffffff 0%, #e5e7eb 100%);
+            position: relative;
+        }
+
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            outline: none;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="step-info">
+            <span id="step-label" class="step-number">Step 01</span>
+            <h1 id="step-title">Y-Axis Beam Assembly</h1>
+            <p id="step-desc">
+                Begin by inspecting the aluminum extrusion. Ensure there is no debris in the slots. 
+                Position the MGN linear rail on the top face as shown in the 3D model.
+            </p>
+        </div>
+
+        <div class="nav-controls">
+            <button id="prevBtn" onclick="changeStep(-1)" disabled>Previous</button>
+            <button id="nextBtn" onclick="changeStep(1)">Next Step</button>
+        </div>
+    </div>
+
+    <div class="viewer-container">
+        <model-viewer 
+            id="manual-viewer"
+            src="100_01__Beam_MGN_Y_Axis__asmbl___V1.glb" 
+            alt="3D CAD Model"
+            camera-controls 
+            touch-action="none"
+            min-camera-orbit="auto auto auto"
+            max-camera-orbit="auto auto auto"
+            shadow-intensity="1" 
+            environment-image="neutral"
+            exposure="1">
+        </model-viewer>
+        
+        <div class="hint">Left Click to Rotate 360° | Scroll to Zoom</div>
+    </div>
+
+    <script>
+        // Setup your steps here!
+        const steps = [
+            {
+                label: "Step 01",
+                title: "Y-Axis Beam Assembly",
+                desc: "Begin by inspecting the aluminum extrusion. Ensure there is no debris in the slots. Position the MGN linear rail on the top face.",
+                file: "100_01__Beam_MGN_Y_Axis__asmbl___V1.glb"
+            },
+            {
+                label: "Step 02",
+                title: "Mounting the Motor",
+                desc: "Attach the NEMA 17 motor to the end bracket using four M3x10mm screws. Do not over-tighten yet.",
+                file: "step2_motor.glb" // Replace with your actual filename
+            }
+        ];
+
+        let currentStep = 0;
+        const viewer = document.getElementById('manual-viewer');
+
+        function changeStep(direction) {
+            currentStep += direction;
+
+            // Update UI text
+            document.getElementById('step-label').innerText = steps[currentStep].label;
+            document.getElementById('step-title').innerText = steps[currentStep].title;
+            document.getElementById('step-desc').innerText = steps[currentStep].desc;
+            
+            // Update 3D Model
+            viewer.src = steps[currentStep].file;
+
+            // Manage button states
+            document.getElementById('prevBtn').disabled = (currentStep === 0);
+            document.getElementById('nextBtn').disabled = (currentStep === steps.length - 1);
+        }
+    </script>
+
+</body>
+</html>
