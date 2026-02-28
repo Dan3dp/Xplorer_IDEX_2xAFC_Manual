@@ -1,11 +1,11 @@
 [
   {
-    "chapter": "Chapter 1: The Frame",
+    "chapter": "Chapter 1:Introduction",
     "steps": [
       {
-        "title": "Base Extrusion",
-        "desc": "First, ensure the extrusion is clean of debris.\n\n**BOM for this step:**\n- 1x Aluminum Extrusion (2040)\n- 1x MGN12H Linear Rail (300mm)\n- 12x M3x8mm Button Head Screws\n- 12x M3 T-Nuts",
-        "file": "100_01__Beam_MGN_Y_Axis__asmbl___V1.glb"
+        "title": "1.0: About the Project",
+        "desc": "Some basic things to know about Xplorer 3D printer",
+        "file": "1.0: About the Project.pdf"
       },
       {
         "title": "Corner Brackets",
@@ -19,7 +19,7 @@
     "steps": [
       {
         "title": "Y-Axis Motor",
-        "desc": "Mount the NEMA 17 motor to the rear plate.",
+        "desc": "First, ensure the extrusion is clean of debris.\n\n**BOM for this step:**\n- 1x Aluminum Extrusion (2040)\n- 1x MGN12H Linear Rail (300mm)\n- 12x M3x8mm Button Head Screws\n- 12x M3 T-Nuts",
         "file": "chapters/02-motors/step1.glb"
       }
     ]
