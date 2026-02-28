@@ -2,97 +2,96 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD-Style 3D Manual</title>
-    
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-
+    <title>Professional CAD Viewer</title>
     <style>
-        body { margin: 0; font-family: sans-serif; display: flex; height: 100vh; background: #2c2c2c; color: white; overflow: hidden; }
-        .sidebar { width: 350px; padding: 30px; background: #1a1a1a; display: flex; flex-direction: column; border-right: 1px solid #444; }
-        .step-info { flex-grow: 1; }
-        h1 { font-size: 20px; color: #3b82f6; }
-        p { color: #ccc; line-height: 1.5; }
-        .nav-controls { display: flex; gap: 10px; padding-top: 20px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 4px; background: #3b82f6; color: white; cursor: pointer; font-weight: bold; }
-        button:disabled { background: #555; }
-        
-        .viewer-container { flex-grow: 1; position: relative; cursor: crosshair; }
-        model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
-        
-        .hint { position: absolute; top: 20px; right: 20px; font-size: 11px; color: #888; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 4px; }
+        body { margin: 0; display: flex; height: 100vh; font-family: sans-serif; background: #232323; color: white; overflow: hidden; }
+        .sidebar { width: 320px; padding: 30px; background: #1a1a1a; border-right: 1px solid #444; z-index: 100; }
+        #container { flex-grow: 1; position: relative; }
+        .hint { position: absolute; bottom: 20px; left: 20px; color: #888; font-size: 12px; }
+        button { width: 100%; padding: 10px; margin-top: 20px; cursor: pointer; background: #444; color: white; border: 1px solid #666; }
+        button:hover { background: #555; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="step-info">
-            <span id="step-label" style="font-size: 12px; color: #888;">STEP 01</span>
-            <h1 id="step-title">Y-Axis Assembly</h1>
-            <p id="step-desc">Loading assembly instructions...</p>
-        </div>
-        <div class="nav-controls">
-            <button id="prevBtn" onclick="changeStep(-1)" disabled>PREV</button>
-            <button id="nextBtn" onclick="changeStep(1)">NEXT</button>
-        </div>
+        <h2>Assembly Step 1</h2>
+        <p>This viewer uses <strong>Arcball Controls</strong>. You can rotate freely on any axis, just like in your CAD software.</p>
+        <button onclick="location.reload()">Reset View</button>
     </div>
 
-    <div class="viewer-container">
-        <model-viewer 
-            id="manual-viewer"
-            src="100_01__Beam_MGN_Y_Axis__asmbl___V1.glb" 
-            camera-controls 
-            touch-action="none"
-            interaction-prompt="none"
-            camera-orbit="45deg 75deg auto"
-            field-of-view="30deg"
-            interpolation-decay="100"
-            min-camera-orbit="auto auto auto"
-            max-camera-orbit="auto auto auto"
-            shadow-intensity="1"
-            environment-image="neutral">
-        </model-viewer>
-        
-        <div class="hint">CAD MODE: Left Click to Tumble | Right Click to Pan | Scroll to Zoom</div>
+    <div id="container">
+        <div class="hint">Left Click: Free Rotate (Trackball) | Right Click: Pan | Scroll: Zoom</div>
     </div>
 
-    <script>
-        const viewer = document.getElementById('manual-viewer');
-
-        // This script forces the model to treat ALL axes as equal (Trackball style)
-        // by resetting the 'up' vector constraints as much as the browser allows.
-        viewer.addEventListener('load', () => {
-            const orbit = viewer.getCameraOrbit();
-            viewer.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad auto`;
-        });
-
-        const steps = [
-            {
-                label: "STEP 01",
-                title: "Y-Axis Beam Assembly",
-                desc: "Align the MGN linear rail with the pre-drilled holes on the aluminum extrusion.",
-                file: "100_01__Beam_MGN_Y_Axis__asmbl___V1.glb"
-            },
-            {
-                label: "STEP 02",
-                title: "Motor Installation",
-                desc: "Mount the stepper motor using the provided M3 screws.",
-                file: "step2_motor.glb" 
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
             }
-        ];
+        }
+    </script>
 
-        let currentStep = 0;
-        document.getElementById('step-desc').innerText = steps[0].desc;
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
 
-        function changeStep(direction) {
-            currentStep += direction;
-            document.getElementById('step-label').innerText = steps[currentStep].label;
-            document.getElementById('step-title').innerText = steps[currentStep].title;
-            document.getElementById('step-desc').innerText = steps[currentStep].desc;
-            viewer.src = steps[currentStep].file;
+        let scene, camera, renderer, controls;
 
-            document.getElementById('prevBtn').disabled = (currentStep === 0);
-            document.getElementById('nextBtn').disabled = (currentStep === steps.length - 1);
+        init();
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x232323);
+
+            camera = new THREE.PerspectiveCamera(45, (window.innerWidth - 320) / window.innerHeight, 0.1, 1000);
+            camera.position.set(2, 2, 2);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth - 320, window.innerHeight);
+            document.getElementById('container').appendChild(renderer.domElement);
+
+            // Lighting
+            const light1 = new THREE.DirectionalLight(0xffffff, 3);
+            light1.position.set(5, 5, 5);
+            scene.add(light1);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+            // THE KEY COMPONENT: Arcball Controls (CAD Style)
+            controls = new ArcballControls(camera, renderer.domElement, scene);
+            controls.setGizmosVisible(false); // Hide the rotation circles for a cleaner look
+
+            // Load your model
+            const loader = new GLTFLoader();
+            loader.load('100_01__Beam_MGN_Y_Axis__asmbl___V1.glb', function (gltf) {
+                const model = gltf.scene;
+                
+                // Center the model automatically
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                model.position.sub(center);
+                
+                scene.add(model);
+            }, undefined, function (error) {
+                console.error("Error loading model. Check your filename!", error);
+            });
+
+            window.addEventListener('resize', onWindowResize);
+            animate();
+        }
+
+        function onWindowResize() {
+            camera.aspect = (window.innerWidth - 320) / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth - 320, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
         }
     </script>
 </body>
