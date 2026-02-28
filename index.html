@@ -1,0 +1,26 @@
+<style>
+  .manual-container { display: flex; height: 100vh; }
+  .instructions { width: 30%; padding: 20px; overflow-y: auto; border-right: 1px solid #ccc; }
+  .viewer-side { width: 70%; position: relative; }
+  model-viewer { width: 100%; height: 100%; }
+</style>
+
+<div class="manual-container">
+  <div class="instructions">
+    <h2>Step 1: The Base</h2>
+    <p>Take the main frame and insert the M3 screws into the bottom slots.</p>
+    <button onclick="changeModel('step2.glb', 'Step 2: Motors')">Next Step</button>
+  </div>
+
+  <div class="viewer-side">
+    <model-viewer id="manual-view" src="step1.glb" camera-controls auto-rotate></model-viewer>
+  </div>
+</div>
+
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+<script>
+  function changeModel(fileName, stepTitle) {
+    document.getElementById('manual-view').src = fileName;
+    document.querySelector('h2').innerText = stepTitle;
+  }
+</script>
