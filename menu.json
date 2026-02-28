@@ -4,7 +4,7 @@
     "steps": [
       {
         "title": "Base Extrusion",
-        "desc": "Align the MGN linear rail with the aluminum extrusion.",
+        "desc": "First, ensure the extrusion is clean of debris.\n\n**BOM for this step:**\n- 1x Aluminum Extrusion (2040)\n- 1x MGN12H Linear Rail (300mm)\n- 12x M3x8mm Button Head Screws\n- 12x M3 T-Nuts",
         "file": "100_01__Beam_MGN_Y_Axis__asmbl___V1.glb"
       },
       {
