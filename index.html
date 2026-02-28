@@ -2,33 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Xplorer IDEX Twin AFC</title>
+    <title>Xplorer IDEX Twin AFC - Assembly Manual</title>
     <style>
-        :root { 
-            --accent: #2563eb; 
-            --bg: #ffffff; 
-            --sidebar: #f8fafc; 
-            --text: #1e293b; 
-            --border: #e2e8f0; 
-        }
-
-        /* Dark Mode Theme */
-        body.dark-mode {
-            --bg: #121212;
-            --sidebar: #1a1a1a;
-            --text: #e2e8f0;
-            --border: #333;
-        }
-
+        :root { --accent: #2563eb; --bg: #ffffff; --sidebar: #f8fafc; --text: #1e293b; --border: #e2e8f0; }
+        body.dark-mode { --bg: #121212; --sidebar: #1a1a1a; --text: #e2e8f0; --border: #333; }
         body { margin: 0; display: flex; height: 100vh; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; transition: background 0.3s; }
         
         /* Sidebar */
-        .sidebar { width: 340px; padding: 25px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; transition: background 0.3s; }
-        
+        .sidebar { width: 340px; padding: 25px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
         .progress-container { width: 100%; height: 6px; background: var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
         #progress-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s ease; }
         #step-counter { font-size: 11px; color: #94a3b8; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
-
         select { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-weight: bold; cursor: pointer; }
         
         .step-content { flex-grow: 1; overflow-y: auto; padding-right: 10px; }
@@ -41,46 +25,43 @@
         button:disabled { background: #cbd5e1; cursor: not-allowed; }
         
         .ui-controls { display: flex; gap: 5px; margin-top: 10px; }
-        .reset-btn { background: #64748b; font-size: 11px; padding: 8px; flex: 2; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .theme-btn { background: #444; font-size: 11px; padding: 8px; flex: 1; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .reset-btn, .theme-btn { font-size: 11px; padding: 8px; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .reset-btn { background: #64748b; flex: 2; }
+        .theme-btn { background: #444; flex: 1; }
 
-        /* Viewport */
-        #viewport { flex-grow: 1; position: relative; background: #ffffff; }
+        /* Viewport Logic */
+        #viewport { flex-grow: 1; position: relative; background: #ffffff; display: flex; }
         #canvas-container { width: 100%; height: 100%; position: absolute; top:0; left:0; }
         
-        /* Media Fix */
+        /* Full-screen Media Fix */
         #media-container { 
             width: 100%; 
             height: 100%; 
-            position: absolute; 
-            top:0; 
-            left:0; 
             display: none; 
-            justify-content: center; 
-            align-items: center; 
             background: #ffffff; 
-            padding: 0; /* Removed padding to allow PDF to fill space */
-            box-sizing: border-box; 
+            overflow: hidden; 
+            position: absolute;
+            top: 0;
+            left: 0;
         }
-        #media-container iframe { width: 100%; height: 100%; border: none; }
-        #media-container img { max-width: 95%; max-height: 95%; object-fit: contain; }
+        #media-container iframe { width: 100%; height: 100%; border: none; display: block; }
+        #media-container img { max-width: 100%; max-height: 100%; object-fit: contain; margin: auto; }
 
-        #loader-ui { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; color: var(--accent); font-weight: bold; z-index: 5; }
+        #loader-ui { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; color: var(--accent); font-weight: bold; }
         .hint { position: absolute; bottom: 20px; right: 20px; font-size: 11px; color: #94a3b8; background: rgba(0,0,0,0.05); padding: 5px 12px; border-radius: 20px; pointer-events: none;}
     </style>
 </head>
-<body class="light-mode">
+<body>
 
     <div class="sidebar">
         <div class="progress-container"><div id="progress-fill"></div></div>
         <div id="step-counter">Step 1 of 1</div>
-
         <label style="font-size: 10px; color: #94a3b8; font-weight: bold;">CHAPTER</label>
         <select id="chapterSelect" onchange="loadChapter(this.value)"></select>
 
         <div class="step-content">
-            <h1 id="step-title">Loading...</h1>
-            <div id="step-desc">Connecting...</div>
+            <h1 id="step-title">Xplorer IDEX Twin AFC</h1>
+            <div id="step-desc">Loading manual instructions...</div>
             <div class="ui-controls">
                 <button id="resetViewBtn" class="reset-btn" onclick="fitCameraToModel()">Reset Camera</button>
                 <button class="theme-btn" onclick="document.body.classList.toggle('dark-mode')">Dark Mode</button>
@@ -167,7 +148,7 @@
             const chapter = menuData[chapIdx];
             const step = chapter.steps[stepIdx];
             const fileName = step.file.toLowerCase();
-            const version = '&v=' + new Date().getTime();
+            const version = '?v=' + new Date().getTime();
 
             document.getElementById('progress-fill').style.width = `${((stepIdx + 1) / chapter.steps.length) * 100}%`;
             document.getElementById('step-counter').innerText = `Step ${stepIdx + 1} of ${chapter.steps.length}`;
@@ -192,15 +173,13 @@
 
                 if (currentModel) scene.remove(currentModel);
                 
-                loader.load(step.file + version, (gltf) => {
+                loader.load(encodeURI(step.file) + version, (gltf) => {
                     loaderUI.style.display = "none";
                     currentModel = gltf.scene;
-                    
                     if (gltf.animations && gltf.animations.length) {
                         mixer = new THREE.AnimationMixer(currentModel);
                         gltf.animations.forEach((clip) => { mixer.clipAction(clip).play(); });
                     } else { mixer = null; }
-
                     currentModel.traverse(node => {
                         if (node.isMesh) {
                             const edges = new THREE.EdgesGeometry(node.geometry, 15);
@@ -220,14 +199,12 @@
                 hint.style.display = "none";
                 mediaDiv.style.display = "flex";
 
-                const mediaUrl = step.file + version;
+                const mediaUrl = encodeURI(step.file) + version;
 
                 if (fileName.endsWith('.pdf')) {
-                    mediaDiv.style.padding = "0";
                     mediaDiv.innerHTML = `<iframe src="${mediaUrl}"></iframe>`;
                 } else {
-                    mediaDiv.style.padding = "40px";
-                    mediaDiv.innerHTML = `<img src="${mediaUrl}">`;
+                    mediaDiv.innerHTML = `<img src="${mediaUrl}" style="padding: 20px;">`;
                 }
             }
         }
