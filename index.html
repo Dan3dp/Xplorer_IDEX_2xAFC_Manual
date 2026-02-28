@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Auto-Fit CAD Manual</title>
+    <title>CAD Manual - No Clipping</title>
     <style>
         :root { --accent: #2563eb; --bg: #ffffff; --sidebar: #f8fafc; --text: #1e293b; }
         body { margin: 0; display: flex; height: 100vh; font-family: sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
@@ -12,7 +12,9 @@
         p { line-height: 1.6; color: #64748b; font-size: 14px; }
         .nav-btns { display: flex; gap: 10px; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 20px; }
         button { flex: 1; padding: 12px; border: none; border-radius: 8px; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background: #1d4ed8; }
         button:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .reset-btn { background: #64748b; margin-top: 10px; font-size: 12px; padding: 8px; }
         #container { flex-grow: 1; position: relative; }
         .hint { position: absolute; bottom: 20px; right: 20px; font-size: 11px; color: #94a3b8; background: rgba(255,255,255,0.9); padding: 5px 12px; border: 1px solid #e2e8f0; border-radius: 20px; }
     </style>
@@ -24,6 +26,7 @@
             <div id="step-num" style="color:var(--accent); font-weight:bold; font-size:12px;">STEP 01</div>
             <h1 id="step-title">Y-Axis Assembly</h1>
             <p id="step-desc">Loading instructions...</p>
+            <button class="reset-btn" onclick="fitCameraToModel()">Reset Camera View</button>
         </div>
         <div class="nav-btns">
             <button id="prevBtn" onclick="changeStep(-1)" disabled>Back</button>
@@ -73,7 +76,8 @@
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0xfcfcfc); 
 
-            camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 0.1, 1000);
+            // FIX: Near plane changed to 0.001 to allow extreme zooming
+            camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 0.001, 2000);
             
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth - 340, window.innerHeight);
@@ -82,7 +86,6 @@
             renderer.toneMappingExposure = 1.2;
             document.getElementById('container').appendChild(renderer.domElement);
 
-            // Studio Lighting
             const keyLight = new THREE.DirectionalLight(0xffffff, 2);
             keyLight.position.set(5, 10, 5);
             scene.add(keyLight);
@@ -103,7 +106,6 @@
             loader.load(url, (gltf) => {
                 currentModel = gltf.scene;
                 
-                // 1. Add Edges (for better visibility)
                 currentModel.traverse((node) => {
                     if (node.isMesh) {
                         const edges = new THREE.EdgesGeometry(node.geometry, 15);
@@ -112,26 +114,30 @@
                     }
                 });
 
-                // 2. Center the Model
                 const box = new THREE.Box3().setFromObject(currentModel);
                 const center = box.getCenter(new THREE.Vector3());
-                const size = box.getSize(new THREE.Vector3());
                 currentModel.position.sub(center);
                 scene.add(currentModel);
 
-                // 3. FIT TO WINDOW (The Magic Part)
-                const maxDim = Math.max(size.x, size.y, size.z);
-                const fov = camera.fov * (Math.PI / 180);
-                let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-                
-                // Add a little extra space (buffer) so it's not touching the edges
-                cameraZ *= 1.5; 
-
-                camera.position.set(cameraZ, cameraZ / 2, cameraZ); // Set an isometric-style starting position
-                camera.lookAt(0, 0, 0);
-                controls.update();
+                fitCameraToModel();
             });
         }
+
+        // --- GLOBAL CAMERA RESET FUNCTION ---
+        window.fitCameraToModel = function() {
+            if (!currentModel) return;
+            const box = new THREE.Box3().setFromObject(currentModel);
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const fov = camera.fov * (Math.PI / 180);
+            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+            
+            cameraZ *= 1.8; // Buffer space
+            
+            camera.position.set(cameraZ, cameraZ / 1.5, cameraZ);
+            camera.lookAt(0, 0, 0);
+            controls.update();
+        };
 
         function updateUI() {
             const s = steps[currentIdx];
