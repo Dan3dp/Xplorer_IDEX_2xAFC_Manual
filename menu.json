@@ -1,0 +1,27 @@
+[
+  {
+    "chapter": "Chapter 1: The Frame",
+    "steps": [
+      {
+        "title": "Base Extrusion",
+        "desc": "Align the MGN linear rail with the aluminum extrusion.",
+        "file": "chapters/01-frame/step1.glb"
+      },
+      {
+        "title": "Corner Brackets",
+        "desc": "Attach the L-brackets to the corners using M5 screws.",
+        "file": "chapters/01-frame/step2.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 2: Motion System",
+    "steps": [
+      {
+        "title": "Y-Axis Motor",
+        "desc": "Mount the NEMA 17 motor to the rear plate.",
+        "file": "chapters/02-motors/step1.glb"
+      }
+    ]
+  }
+]
