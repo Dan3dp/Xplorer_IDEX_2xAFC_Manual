@@ -18,7 +18,7 @@
         .nav-btns { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
         button { flex: 1; padding: 12px; border: none; border-radius: 8px; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
         button:disabled { background: #cbd5e1; cursor: not-allowed; }
-        #viewport { flex-grow: 1; position: relative; background: #ffffff; }
+        #viewport { flex-grow: 1; position: relative; background: #ffffff; display: flex; }
         #canvas-container { width: 100%; height: 100%; position: absolute; }
         #loader-ui { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; color: var(--accent); font-weight: bold; z-index: 5; }
     </style>
@@ -29,7 +29,7 @@
         <select id="chapterSelect" onchange="loadChapter(this.value)"></select>
         <div class="step-content">
             <h1 id="step-title">Xplorer IDEX</h1>
-            <div id="step-desc">Loading instructions...</div>
+            <div id="step-desc">Loading...</div>
             <button style="margin-top:10px; background:#64748b; color:white; border:none; padding:8px; border-radius:4px; font-size:11px; cursor:pointer;" onclick="fitCameraToModel()">Center View</button>
         </div>
         <div class="nav-btns">
@@ -38,7 +38,7 @@
         </div>
     </div>
     <div id="viewport">
-        <div id="loader-ui">Blasting with Light...</div>
+        <div id="loader-ui">Loading 3D Model...</div>
         <div id="canvas-container"></div>
     </div>
 
@@ -60,8 +60,6 @@
 
         let menuData = [], currentChapIdx = 0, currentStepIdx = 0;
         let scene, camera, renderer, controls, currentModel;
-        let headlamp; // The light that follows the camera
-        
         const loader = new GLTFLoader();
         loader.setMeshoptDecoder(MeshoptDecoder);
 
@@ -77,41 +75,28 @@
         function initThree() {
             scene = new THREE.Scene();
             
-            // Camera Near plane set to 0.1 for macro zooming
-            camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 0.1, 20000);
+            // ZOOM FIX: Standard Near plane 0.5 prevents "X-ray" while allowing close zoom
+            camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 0.5, 50000);
             
             renderer = new THREE.WebGLRenderer({ 
                 antialias: true, 
-                alpha: true,
-                logarithmicDepthBuffer: true 
+                alpha: true
             });
             renderer.setSize(window.innerWidth - 340, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
-            
-            // FIX: Modern Color management for brighter, accurate colors
             renderer.outputColorSpace = THREE.SRGBColorSpace;
-            renderer.toneMapping = THREE.NeutralToneMapping;
-            renderer.toneMappingExposure = 1.5; // Overall brightness boost
-            
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            // LIGHTING RIG: Studio Setup
-            // 1. Massive Ambient Fill (No shadows here)
-            const ambient = new THREE.AmbientLight(0xffffff, 1.8); 
-            scene.add(ambient);
+            // MORE LIGHT FIX: High-intensity global illumination
+            scene.add(new THREE.AmbientLight(0xffffff, 2.5)); // Full fill light
+            
+            const light1 = new THREE.DirectionalLight(0xffffff, 1.5);
+            light1.position.set(100, 200, 100);
+            scene.add(light1);
 
-            // 2. High Hemisphere Light (Skylight effect)
-            const hemi = new THREE.HemisphereLight(0xffffff, 0xffffff, 1.2);
-            scene.add(hemi);
-
-            // 3. The "Headlamp" (Stays with camera)
-            headlamp = new THREE.DirectionalLight(0xffffff, 2.0);
-            scene.add(headlamp);
-
-            // 4. Fixed Back Light (To define edges)
-            const backLight = new THREE.DirectionalLight(0xffffff, 1.0);
-            backLight.position.set(-500, 500, -500);
-            scene.add(backLight);
+            const light2 = new THREE.DirectionalLight(0xffffff, 1.5);
+            light2.position.set(-100, -200, -100);
+            scene.add(light2);
 
             controls = new ArcballControls(camera, renderer.domElement, scene);
             controls.setGizmosVisible(false);
@@ -123,9 +108,9 @@
             currentStepIdx = stepIdx;
             const step = menuData[chapIdx].steps[stepIdx];
             const version = '?v=' + new Date().getTime();
+            const loaderUI = document.getElementById('loader-ui');
 
             document.getElementById('step-title').innerText = step.title;
-            const loaderUI = document.getElementById('loader-ui');
             loaderUI.style.display = "block";
 
             if (step.desc_file) {
@@ -138,15 +123,13 @@
 
             loader.load(encodeURI(step.file) + version, (gltf) => {
                 currentModel = gltf.scene;
-                
                 currentModel.traverse(node => {
                     if (node.isMesh) {
                         node.material.depthWrite = true;
                         node.material.transparent = false;
-                        node.material.side = THREE.FrontSide; 
-                        node.material.opacity = 1.0;
+                        node.material.side = THREE.FrontSide;
                         
-                        // Technical Black Edges
+                        // Technical Edges
                         const edges = new THREE.EdgesGeometry(node.geometry, 25);
                         const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000 }));
                         node.add(line);
@@ -167,7 +150,6 @@
             const size = box.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
             const fov = camera.fov * (Math.PI / 180);
-            // ZOOM FIX: 1.1 multiplier for a full-screen view
             let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.1;
 
             camera.position.set(cameraZ, cameraZ, cameraZ);
@@ -176,17 +158,7 @@
             controls.update();
         };
 
-        function animate() {
-            requestAnimationFrame(animate);
-            // HEADLAMP FIX: Light always points at what the user is looking at
-            if (headlamp) {
-                headlamp.position.copy(camera.position);
-                headlamp.target.position.set(0, 0, 0);
-            }
-            controls.update();
-            renderer.render(scene, camera);
-        }
-
+        function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
         function populateChapters() {
             const select = document.getElementById('chapterSelect');
             menuData.forEach((item, index) => {
