@@ -9,6 +9,7 @@
         body.dark-mode { --bg: #121212; --sidebar: #1a1a1a; --text: #e2e8f0; --border: #333; }
         body { margin: 0; display: flex; height: 100vh; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; transition: background 0.3s; }
         
+        /* Sidebar */
         .sidebar { width: 340px; padding: 25px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
         .progress-container { width: 100%; height: 6px; background: var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
         #progress-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s ease; }
@@ -18,19 +19,24 @@
         
         .step-content { flex-grow: 1; overflow-y: auto; padding-right: 10px; }
         h1 { font-size: 22px; margin: 5px 0; color: var(--accent); line-height: 1.2; }
+        
+        /* Markdown Style for BOM and Instructions */
         #step-desc { line-height: 1.6; font-size: 14px; margin-bottom: 20px; color: var(--text); }
-        #step-desc table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        #step-desc h1, #step-desc h2, #step-desc h3 { color: var(--accent); margin-top: 20px; font-size: 18px; }
+        #step-desc ul { padding-left: 20px; margin-bottom: 15px; }
+        #step-desc table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px; }
         #step-desc th, #step-desc td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+        #step-desc th { background: var(--border); }
 
         .nav-btns { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
         button { flex: 1; padding: 12px; border: none; border-radius: 8px; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
         button:disabled { background: #cbd5e1; cursor: not-allowed; }
         
         .ui-controls { display: flex; gap: 5px; margin-top: 10px; }
-        .reset-btn, .theme-btn { font-size: 11px; padding: 8px; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .reset-btn { background: #64748b; flex: 2; }
-        .theme-btn { background: #444; flex: 1; }
+        .reset-btn { background: #64748b; flex: 1; font-size: 11px; padding: 8px; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .theme-btn { background: #444; flex: 1; font-size: 11px; padding: 8px; color: white; border: none; border-radius: 4px; cursor: pointer; }
 
+        /* Viewport Layout */
         #viewport { flex-grow: 1; position: relative; background: #ffffff; display: flex; }
         #canvas-container { width: 100%; height: 100%; position: absolute; top:0; left:0; }
         #media-container { width: 100%; height: 100%; display: none; background: #ffffff; position: absolute; top: 0; left: 0; }
@@ -53,7 +59,7 @@
             <h1 id="step-title">Xplorer IDEX Twin AFC</h1>
             <div id="step-desc">Loading instructions...</div>
             <div class="ui-controls">
-                <button id="resetViewBtn" class="reset-btn" onclick="fitCameraToModel()">Reset Camera</button>
+                <button id="resetViewBtn" class="reset-btn" onclick="fitCameraToModel()">Center View</button>
                 <button class="theme-btn" onclick="document.body.classList.toggle('dark-mode')">Dark Mode</button>
             </div>
         </div>
@@ -65,7 +71,7 @@
     </div>
 
     <div id="viewport">
-        <div id="loader-ui">Loading 3D Model...</div>
+        <div id="loader-ui">Decoding 3D Data...</div>
         <div id="canvas-container"></div>
         <div id="media-container"></div>
         <div id="3d-hint" class="hint">Left Click: Rotate | Right Click: Pan | Scroll: Zoom</div>
@@ -75,7 +81,8 @@
         {
             "imports": {
                 "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+                "meshoptimizer": "https://unpkg.com/meshoptimizer@0.20.0/meshopt_decoder.module.js"
             }
         }
     </script>
@@ -84,10 +91,14 @@
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
+        import { MeshoptDecoder } from 'meshoptimizer';
 
         let menuData = [], currentChapIdx = 0, currentStepIdx = 0;
         let scene, camera, renderer, controls, currentModel;
+        
+        // Setup Loader with Meshopt Support to fix "2_0.glb" hang
         const loader = new GLTFLoader();
+        loader.setMeshoptDecoder(MeshoptDecoder);
 
         fetch('menu.json?v=' + new Date().getTime())
             .then(res => res.json())
@@ -113,13 +124,13 @@
         function initThree() {
             scene = new THREE.Scene();
             
-            // Adjusting near/far plane for high-precision large scale models
-            camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 0.5, 10000);
+            // Camera near/far adjusted for high-precision large scale models
+            camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 0.5, 20000);
             
             renderer = new THREE.WebGLRenderer({ 
                 antialias: true, 
                 alpha: true,
-                logarithmicDepthBuffer: true 
+                logarithmicDepthBuffer: true // FIX: Prevents X-ray/ghosting effects on full frame
             });
             renderer.setSize(window.innerWidth - 340, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
@@ -144,6 +155,7 @@
 
             document.getElementById('step-title').innerText = step.title;
 
+            // Load Markdown Description
             if (step.desc_file) {
                 try {
                     const res = await fetch(step.desc_file + version);
@@ -162,19 +174,22 @@
                 canvasDiv.style.display = "block";
                 mediaDiv.style.display = "none";
                 loaderUI.style.display = "block";
+                loaderUI.innerHTML = "Downloading 3D Data...";
+
                 if (currentModel) scene.remove(currentModel);
 
-                loader.load(step.file + version, (gltf) => {
+                loader.load(encodeURI(step.file) + version, (gltf) => {
                     currentModel = gltf.scene;
                     
                     currentModel.traverse(node => {
                         if (node.isMesh) {
-                            // SOLIDITY FIX: Disable transparency and set side to FRONT
+                            // SOLIDITY FIX: Disable transparency and force front-side only rendering
                             node.material.depthWrite = true;
                             node.material.transparent = false;
-                            node.material.side = THREE.FrontSide; // Stops you from seeing "through" the extrusions
+                            node.material.side = THREE.FrontSide; 
                             node.material.opacity = 1.0;
                             
+                            // Visual edges for CAD feel
                             const edges = new THREE.EdgesGeometry(node.geometry, 25);
                             const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000 }));
                             node.add(line);
@@ -186,12 +201,16 @@
                     scene.add(currentModel);
                     fitCameraToModel();
                     loaderUI.style.display = "none";
+                }, undefined, (error) => {
+                    console.error(error);
+                    loaderUI.innerHTML = `<span style="color:red">Error: ${error.message}</span>`;
                 });
             } else {
                 canvasDiv.style.display = "none";
                 mediaDiv.style.display = "flex";
                 loaderUI.style.display = "none";
-                mediaDiv.innerHTML = fileName.endsWith('.pdf') ? `<iframe src="${step.file + version}"></iframe>` : `<img src="${step.file + version}">`;
+                const mediaUrl = encodeURI(step.file) + version;
+                mediaDiv.innerHTML = fileName.endsWith('.pdf') ? `<iframe src="${mediaUrl}" style="width:100%;height:100%;"></iframe>` : `<img src="${mediaUrl}">`;
             }
             document.getElementById('progress-fill').style.width = `${((stepIdx + 1) / menuData[chapIdx].steps.length) * 100}%`;
             document.getElementById('step-counter').innerText = `Step ${stepIdx + 1} of ${menuData[chapIdx].steps.length}`;
@@ -207,7 +226,7 @@
             const maxDim = Math.max(size.x, size.y, size.z);
             
             const fov = camera.fov * (Math.PI / 180);
-            // ZOOM FIX: Reduced multiplier from 1.5 to 1.15 to make the model fill the view
+            // ZOOM FIX: Multiplier reduced to 1.15 so the model fills the view immediately
             let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.15;
 
             camera.position.set(cameraZ, cameraZ, cameraZ);
