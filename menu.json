@@ -1,12 +1,11 @@
-
 [
   {
     "chapter": "Chapter 1: Introduction",
     "steps": [
       {
         "title": "1.0: About the Project",
-        "desc": "Description/1_0.md",
-        "file": "Graphics/1_0: About the Project.pdf"
+        "desc_file": "Descriptions/1_0.md",
+        "file": "Graphics/1_0_About_the_Project.pdf"
       }
     ]
   },
@@ -15,13 +14,13 @@
     "steps": [
       {
         "title": "2.0: Frame - Introduction",
-        "desc": "Description/2_0.md",
+        "desc_file": "Descriptions/2_0.md",
         "file": "Graphics/2_0.glb"
-        }
-      ]
-    },
-    {
-      "chapter": "Chapter 2.1: Frame beam MGN Y-Axis",
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 2.1: Frame beam MGN Y-Axis",
     "steps": [
       {
         "title": "2.1: Frame beam MGN Y-Axis",
