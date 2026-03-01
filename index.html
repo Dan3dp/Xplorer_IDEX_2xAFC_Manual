@@ -113,9 +113,10 @@
 
         function initThree() {
             scene = new THREE.Scene();
-            // FIX: Near plane set to 0.01 to allow close zoom
-            camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 0.01, 5000);
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            // camera near/far planes adjusted for better depth and zoom
+            camera = new THREE.PerspectiveCamera(45, (window.innerWidth - 340) / window.innerHeight, 0.1, 20000);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, logarithmicDepthBuffer: true }); // logarithmicDepthBuffer helps Z-fighting
             renderer.setSize(window.innerWidth - 340, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             document.getElementById('canvas-container').appendChild(renderer.domElement);
@@ -139,7 +140,6 @@
 
             document.getElementById('step-title').innerText = step.title;
 
-            // FIX: Load MD from either desc_file or desc
             if (step.desc_file) {
                 try {
                     const res = await fetch(step.desc_file + version);
@@ -165,18 +165,24 @@
                     
                     currentModel.traverse(node => {
                         if (node.isMesh) {
-                            // FIX: Prevent surfaces from disappearing (ghosting)
-                            node.material.depthWrite = true;
+                            // SOLID SURFACES FIX: Force opaque materials and depth writing
                             node.material.transparent = false;
                             node.material.opacity = 1.0;
+                            node.material.depthWrite = true;
+                            node.material.depthTest = true;
+                            node.material.side = THREE.DoubleSide; // Helps see interior walls
                             
+                            // Wireframe Overlay
                             const edges = new THREE.EdgesGeometry(node.geometry, 25);
-                            node.add(new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x222222 })));
+                            const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 1 }));
+                            node.add(line);
                         }
                     });
 
                     const box = new THREE.Box3().setFromObject(currentModel);
-                    currentModel.position.sub(box.getCenter(new THREE.Vector3()));
+                    const center = box.getCenter(new THREE.Vector3());
+                    currentModel.position.sub(center); // Center model at 0,0,0
+                    
                     scene.add(currentModel);
                     fitCameraToModel();
                     loaderUI.style.display = "none";
@@ -199,11 +205,15 @@
             const box = new THREE.Box3().setFromObject(currentModel);
             const size = box.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
+            
+            // ZOOM FIX: Tighter calculation for better initial view
             const fov = camera.fov * (Math.PI / 180);
-            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.2;
+            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.5;
 
+            // Don't let the camera get too far away if the part is tiny
             camera.position.set(cameraZ, cameraZ, cameraZ);
-            camera.updateProjectionMatrix();
+            camera.lookAt(0, 0, 0);
+            
             controls.target.set(0, 0, 0);
             controls.update();
         };
