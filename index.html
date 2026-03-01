@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Xplorer IDEX Twin AFC - Manual</title>
+    <title>Xplorer IDEX Twin AFC - Professional Manual</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root { --accent: #2563eb; --bg: #ffffff; --sidebar: #f8fafc; --text: #1e293b; --border: #e2e8f0; }
@@ -89,7 +89,7 @@
 
         let menuData = [], currentChapIdx = 0, currentStepIdx = 0;
         let scene, camera, renderer, controls, currentModel;
-        let camLight; // Light that follows the camera
+        let camLight;
         
         const loader = new GLTFLoader();
         loader.setMeshoptDecoder(MeshoptDecoder);
@@ -117,7 +117,6 @@
 
         function initThree() {
             scene = new THREE.Scene();
-            
             camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 0.1, 10000);
             
             renderer = new THREE.WebGLRenderer({ 
@@ -127,27 +126,34 @@
             });
             renderer.setSize(window.innerWidth - 340, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
+            
+            // --- MAXIMUM LIGHTING & COLOR ---
             renderer.outputColorSpace = THREE.SRGBColorSpace;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 2.0; // INCREASED EXPOSURE for more brightness
+            
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            // --- BRIGHT LIGHTING CONFIGURATION ---
-            
-            // 1. Ambient Light: Blasts light into every corner evenly
-            const ambient = new THREE.AmbientLight(0xffffff, 2.0); 
+            // 1. Studio Ambient (Boosted)
+            const ambient = new THREE.AmbientLight(0xffffff, 3.0); 
             scene.add(ambient);
 
-            // 2. Hemisphere Light: Natural light from sky and ground
-            const hemi = new THREE.HemisphereLight(0xffffff, 0xffffff, 1.5);
+            // 2. Strong Hemisphere (Boosted)
+            const hemi = new THREE.HemisphereLight(0xffffff, 0xffffff, 2.0);
             scene.add(hemi);
 
-            // 3. Point light: Attached to camera position (Camera Headlamp)
-            camLight = new THREE.PointLight(0xffffff, 2.5, 0, 0); // No decay
+            // 3. Ultra Bright Camera Light (The Headlamp)
+            camLight = new THREE.DirectionalLight(0xffffff, 3.0);
             scene.add(camLight);
-            
-            // 4. Top-Down Directional Light
-            const topLight = new THREE.DirectionalLight(0xffffff, 1.0);
-            topLight.position.set(0, 500, 0);
-            scene.add(topLight);
+
+            // 4. Surround Lighting (Fill all gaps)
+            const fill1 = new THREE.DirectionalLight(0xffffff, 1.5);
+            fill1.position.set(500, 500, 500);
+            scene.add(fill1);
+
+            const fill2 = new THREE.DirectionalLight(0xffffff, 1.5);
+            fill2.position.set(-500, -500, -500);
+            scene.add(fill2);
 
             controls = new ArcballControls(camera, renderer.domElement, scene);
             controls.setGizmosVisible(false);
@@ -195,6 +201,7 @@
                             node.material.side = THREE.FrontSide; 
                             node.material.opacity = 1.0;
                             
+                            // Visual CAD edges
                             const edges = new THREE.EdgesGeometry(node.geometry, 25);
                             const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000 }));
                             node.add(line);
@@ -228,7 +235,6 @@
             const box = new THREE.Box3().setFromObject(currentModel);
             const size = box.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
-            
             const fov = camera.fov * (Math.PI / 180);
             let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.1;
 
@@ -240,7 +246,7 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            // Move the point light to the camera position every frame
+            // Dynamic Headlamp: Moves with camera to blast whatever you look at
             if(camLight) camLight.position.copy(camera.position);
             controls.update();
             renderer.render(scene, camera);
