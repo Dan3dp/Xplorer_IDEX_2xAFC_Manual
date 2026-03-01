@@ -7,66 +7,41 @@
     <style>
         :root { --accent: #2563eb; --bg: #ffffff; --sidebar: #f8fafc; --text: #1e293b; --border: #e2e8f0; }
         body.dark-mode { --bg: #121212; --sidebar: #1a1a1a; --text: #e2e8f0; --border: #333; }
-        body { margin: 0; display: flex; height: 100vh; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; transition: background 0.3s; }
-        
+        body { margin: 0; display: flex; height: 100vh; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
         .sidebar { width: 340px; padding: 25px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
         .progress-container { width: 100%; height: 6px; background: var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
         #progress-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s ease; }
         #step-counter { font-size: 11px; color: #94a3b8; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
-        
         select { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-weight: bold; cursor: pointer; }
-        
         .step-content { flex-grow: 1; overflow-y: auto; padding-right: 10px; }
         h1 { font-size: 22px; margin: 5px 0; color: var(--accent); line-height: 1.2; }
         #step-desc { line-height: 1.6; font-size: 14px; margin-bottom: 20px; color: var(--text); }
-
         .nav-btns { display: flex; gap: 10px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
         button { flex: 1; padding: 12px; border: none; border-radius: 8px; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
         button:disabled { background: #cbd5e1; cursor: not-allowed; }
-        
-        .ui-controls { display: flex; gap: 5px; margin-top: 10px; }
-        .reset-btn, .theme-btn { font-size: 11px; padding: 8px; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .reset-btn { background: #64748b; flex: 2; }
-        .theme-btn { background: #444; flex: 1; }
-
         #viewport { flex-grow: 1; position: relative; background: #ffffff; display: flex; }
-        #canvas-container { width: 100%; height: 100%; position: absolute; top:0; left:0; }
-        #media-container { width: 100%; height: 100%; display: none; background: #ffffff; position: absolute; top: 0; left: 0; }
-        #media-container iframe { width: 100%; height: 100%; border: none; }
-        #media-container img { max-width: 100%; max-height: 100%; object-fit: contain; margin: auto; }
-
-        #loader-ui { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; color: var(--accent); font-weight: bold; z-index: 5; text-align: center; }
-        .hint { position: absolute; bottom: 20px; right: 20px; font-size: 11px; color: #94a3b8; background: rgba(0,0,0,0.05); padding: 5px 12px; border-radius: 20px; pointer-events: none;}
+        #canvas-container { width: 100%; height: 100%; position: absolute; }
+        #loader-ui { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; color: var(--accent); font-weight: bold; z-index: 5; }
     </style>
 </head>
 <body>
-
     <div class="sidebar">
         <div class="progress-container"><div id="progress-fill"></div></div>
         <div id="step-counter">Step 1 of 1</div>
-        <label style="font-size: 10px; color: #94a3b8; font-weight: bold;">CHAPTER</label>
         <select id="chapterSelect" onchange="loadChapter(this.value)"></select>
-
         <div class="step-content">
-            <h1 id="step-title">Xplorer IDEX Twin AFC</h1>
-            <div id="step-desc">Loading instructions...</div>
-            <div class="ui-controls">
-                <button id="resetViewBtn" class="reset-btn" onclick="fitCameraToModel()">Reset Camera</button>
-                <button class="theme-btn" onclick="document.body.classList.toggle('dark-mode')">Dark Mode</button>
-            </div>
+            <h1 id="step-title">Xplorer IDEX</h1>
+            <div id="step-desc">Loading...</div>
+            <button style="margin-top:10px; background:#64748b; color:white; border:none; padding:8px; border-radius:4px; font-size:11px; cursor:pointer;" onclick="fitCameraToModel()">Reset View</button>
         </div>
-
         <div class="nav-btns">
             <button id="prevBtn" onclick="changeStep(-1)" disabled>Back</button>
             <button id="nextBtn" onclick="changeStep(1)" disabled>Next</button>
         </div>
     </div>
-
     <div id="viewport">
-        <div id="loader-ui">Loading 3D Model...</div>
+        <div id="loader-ui">Optimizing 3D Geometry...</div>
         <div id="canvas-container"></div>
-        <div id="media-container"></div>
-        <div id="3d-hint" class="hint">Left Click: Rotate | Right Click: Pan | Scroll: Zoom</div>
     </div>
 
     <script type="importmap">
@@ -96,40 +71,27 @@
                 loadStep(0, 0);
             });
 
-        function populateChapters() {
-            const select = document.getElementById('chapterSelect');
-            menuData.forEach((item, index) => {
-                let opt = document.createElement('option');
-                opt.value = index; opt.innerHTML = item.chapter;
-                select.appendChild(opt);
-            });
-        }
-
-        window.loadChapter = (idx) => loadStep(parseInt(idx), 0);
-        window.changeStep = (dir) => loadStep(currentChapIdx, currentStepIdx + dir);
-
         function initThree() {
             scene = new THREE.Scene();
             
-            // Camera Near plane is now 1.0 to prevent internal ghosting on large models
-            camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 1.0, 50000);
+            // CAMERA FIX: Near plane increased to 5.0 for large models. 
+            // This stops the "X-ray" effect when viewing a whole printer frame.
+            camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 340) / window.innerHeight, 5.0, 100000);
             
             renderer = new THREE.WebGLRenderer({ 
                 antialias: true, 
                 alpha: true,
-                logarithmicDepthBuffer: true // THE KEY: Prevents X-ray/ghosting effects
+                logarithmicDepthBuffer: true 
             });
             renderer.setSize(window.innerWidth - 340, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 2.5));
-            const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
-            dirLight.position.set(500, 1000, 750);
-            scene.add(dirLight);
+            scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 3));
+            const light = new THREE.DirectionalLight(0xffffff, 1.5);
+            light.position.set(1000, 2000, 1500);
+            scene.add(light);
 
             controls = new ArcballControls(camera, renderer.domElement, scene);
-            controls.setGizmosVisible(false);
             animate();
         }
 
@@ -137,65 +99,45 @@
             currentChapIdx = chapIdx;
             currentStepIdx = stepIdx;
             const step = menuData[chapIdx].steps[stepIdx];
-            const fileName = step.file.toLowerCase();
             const version = '?v=' + new Date().getTime();
 
             document.getElementById('step-title').innerText = step.title;
-
-            if (step.desc_file) {
-                try {
-                    const res = await fetch(step.desc_file + version);
-                    const text = await res.text();
-                    document.getElementById('step-desc').innerHTML = marked.parse(text);
-                } catch (e) { document.getElementById('step-desc').innerText = "Description not found."; }
-            } else {
-                document.getElementById('step-desc').innerHTML = marked.parse(step.desc || "");
-            }
-
-            const canvasDiv = document.getElementById('canvas-container');
-            const mediaDiv = document.getElementById('media-container');
             const loaderUI = document.getElementById('loader-ui');
+            loaderUI.style.display = "block";
 
-            if (fileName.endsWith('.glb') || fileName.endsWith('.gltf')) {
-                canvasDiv.style.display = "block";
-                mediaDiv.style.display = "none";
-                loaderUI.style.display = "block";
-                if (currentModel) scene.remove(currentModel);
-
-                loader.load(step.file + version, (gltf) => {
-                    currentModel = gltf.scene;
-                    
-                    currentModel.traverse(node => {
-                        if (node.isMesh) {
-                            // Force materials to be solid
-                            node.material.depthWrite = true;
-                            node.material.transparent = false;
-                            node.material.opacity = 1.0;
-                            
-                            // High-quality wireframe lines
-                            const edges = new THREE.EdgesGeometry(node.geometry, 25);
-                            const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000 }));
-                            node.add(line);
-                        }
-                    });
-
-                    const box = new THREE.Box3().setFromObject(currentModel);
-                    currentModel.position.sub(box.getCenter(new THREE.Vector3()));
-                    scene.add(currentModel);
-                    fitCameraToModel();
-                    loaderUI.style.display = "none";
-                });
-            } else {
-                canvasDiv.style.display = "none";
-                mediaDiv.style.display = "flex";
-                loaderUI.style.display = "none";
-                mediaDiv.innerHTML = fileName.endsWith('.pdf') ? `<iframe src="${step.file + version}"></iframe>` : `<img src="${step.file + version}">`;
+            // Markdown Loading
+            if (step.desc_file) {
+                const res = await fetch(step.desc_file + version);
+                const text = await res.text();
+                document.getElementById('step-desc').innerHTML = marked.parse(text);
             }
-            document.getElementById('progress-fill').style.width = `${((stepIdx + 1) / menuData[chapIdx].steps.length) * 100}%`;
-            document.getElementById('step-counter').innerText = `Step ${stepIdx + 1} of ${menuData[chapIdx].steps.length}`;
-            document.getElementById('prevBtn').disabled = (stepIdx === 0);
-            document.getElementById('nextBtn').disabled = (stepIdx === menuData[chapIdx].steps.length - 1);
-            document.getElementById('chapterSelect').value = chapIdx;
+
+            if (currentModel) scene.remove(currentModel);
+
+            loader.load(step.file + version, (gltf) => {
+                currentModel = gltf.scene;
+                
+                currentModel.traverse(node => {
+                    if (node.isMesh) {
+                        // MATERIAL FIX: Force every part to be solid and opaque
+                        node.material.transparent = false;
+                        node.material.depthWrite = true;
+                        node.material.depthTest = true;
+                        node.material.side = THREE.FrontSide; // Stops you from seeing "inside-out"
+                        
+                        // Clean technical edges
+                        const edges = new THREE.EdgesGeometry(node.geometry, 25);
+                        const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000 }));
+                        node.add(line);
+                    }
+                });
+
+                const box = new THREE.Box3().setFromObject(currentModel);
+                currentModel.position.sub(box.getCenter(new THREE.Vector3()));
+                scene.add(currentModel);
+                fitCameraToModel();
+                loaderUI.style.display = "none";
+            });
         }
 
         window.fitCameraToModel = () => {
@@ -203,8 +145,6 @@
             const box = new THREE.Box3().setFromObject(currentModel);
             const size = box.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
-            
-            // Dynamic Zoom: Fits based on object size
             const fov = camera.fov * (Math.PI / 180);
             let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.5;
 
@@ -214,17 +154,15 @@
             controls.update();
         };
 
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
+        function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+        function populateChapters() {
+            const select = document.getElementById('chapterSelect');
+            menuData.forEach((item, index) => {
+                let opt = document.createElement('option');
+                opt.value = index; opt.innerHTML = item.chapter;
+                select.appendChild(opt);
+            });
         }
-        
-        window.onresize = () => {
-            camera.aspect = (window.innerWidth - 340) / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth - 340, window.innerHeight);
-        };
     </script>
 </body>
 </html>
