@@ -6,7 +6,7 @@
       {
         "title": "1.0: About the Project",
         "desc": "Some basic things to know about Xplorer 3D printer",
-        "file": "1.0: About the Project.pdf"
+        "file": "1_0: About the Project.pdf"
       }
     ]
   },
@@ -16,7 +16,15 @@
       {
         "title": "2.0: Frame - Introduction",
         "desc": "The Xplorer's frame is built entirely from 30×30 mm aluminum extrusion profiles, providing a strong, stable foundation for quality printing.\n\nThe assembly process is intentionally straightforward, with a simple and logical structure that’s easy to follow—even for first-time builders.\n\nTo ensure dimensional accuracy and perfect alignment:\n\nMilled reference surfaces are used in all critical areas, so components align precisely during assembly.\n\nThe result is a frame that stays square, rigid, and vibration-resistant, even during high-speed or multi-toolhead operations.\n\nThis solid foundation is key to the Xplorer’s modular architecture and consistently reliable print quality.",
-        "file": "2.0.glb"
+        "file": "2_0.glb"
+      }
+    ]
+    "chapter": "Chapter 2.1: Frame beam MGN Y-Axis",
+    "steps": [
+      {
+        "title": "2.1: Frame beam MGN Y-Axis",
+        "desc": "In the first and last hole of the rail, preassemble the printed part for MGN rail alignment using DIN 912x20 screws and M3 T-nuts.",
+        "file": "2_1_1.glb"
       }
     ]
   }
