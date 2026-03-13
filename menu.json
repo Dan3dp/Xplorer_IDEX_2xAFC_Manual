@@ -58,5 +58,45 @@
         "file": "Graphics/2_2_3.glb"
       }
     ]
+  },
+  {
+    "chapter": "Chapter 2.3: Frame Left Side",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/2_3_1.md",
+        "file": "Graphics/2_3_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/2_3_2.md",
+        "file": "Graphics/2_3_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/2_3_3.md",
+        "file": "Graphics/2_3_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 2.4: Frame Right Side",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/2_4_1.md",
+        "file": "Graphics/2_4_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/2_4_2.md",
+        "file": "Graphics/2_4_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/2_4_3.md",
+        "file": "Graphics/2_4_3.glb"
+      }
+    ]
   }
 ]
