@@ -98,5 +98,60 @@
         "file": "Graphics/2_4_3.glb"
       }
     ]
+  },
+  {
+    "chapter": "Chapter 2.5: Frame Backside",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/2_5_1.md",
+        "file": "Graphics/2_5_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/2_5_2.md",
+        "file": "Graphics/2_5_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/2_5_3.md",
+        "file": "Graphics/2_5_3.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/2_5_4.md",
+        "file": "Graphics/2_5_4.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 2.6: Frame Completion",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/2_6_1.md",
+        "file": "Graphics/2_6_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/2_6_2.md",
+        "file": "Graphics/2_6_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/2_6_3.md",
+        "file": "Graphics/2_6_3.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/2_6_4.md",
+        "file": "Graphics/2_6_4.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/2_6_5.md",
+        "file": "Graphics/2_6_5.glb"
+      }
+    ]
   }
 ]
