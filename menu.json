@@ -153,5 +153,328 @@
         "file": "Graphics/2_6_5.glb"
       }
     ]
+  },
+  {
+    "chapter": "Chapter 3: XY-Axis Motion System",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_0.md",
+        "file": "Graphics/3_0.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.1: XY-Joint",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_1_1.md",
+        "file": "Graphics/3_1_1.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.2: XY-Gantry",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_2_1.md",
+        "file": "Graphics/3_2_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_2_2.md",
+        "file": "Graphics/3_2_2.glb"
+      },
+      {
+        
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.3: Y-Axis Motors",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_3_1.md",
+        "file": "Graphics/3_3_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_3_2.md",
+        "file": "Graphics/3_3_2.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.4: Assembling Y-Motors on the frame",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_4_1.md",
+        "file": "Graphics/3_4_1.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.5: Tensioner Y-Axis Belt",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_5_1.md",
+        "file": "Graphics/3_5_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_5_2.md",
+        "file": "Graphics/3_5_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_5_3.md",
+        "file": "Graphics/3_5_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.6",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_6_1.md",
+        "file": "Graphics/3_6_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_6_2.md",
+        "file": "Graphics/3_6_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_6_3.md",
+        "file": "Graphics/3_6_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.7",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_7_1.md",
+        "file": "Graphics/3_7_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_7_2.md",
+        "file": "Graphics/3_7_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_7_3.md",
+        "file": "Graphics/3_7_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.8",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_8_1.md",
+        "file": "Graphics/3_8_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_8_2.md",
+        "file": "Graphics/3_8_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_8_3.md",
+        "file": "Graphics/3_8_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.9",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_9_1.md",
+        "file": "Graphics/3_9_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_9_2.md",
+        "file": "Graphics/3_9_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_9_3.md",
+        "file": "Graphics/3_9_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.10",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_10_1.md",
+        "file": "Graphics/3_10_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_10_2.md",
+        "file": "Graphics/3_10_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_10_3.md",
+        "file": "Graphics/3_10_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.11",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_11_1.md",
+        "file": "Graphics/3_11_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_11_2.md",
+        "file": "Graphics/3_11_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_11_3.md",
+        "file": "Graphics/3_11_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.12",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_12_1.md",
+        "file": "Graphics/3_12_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_12_2.md",
+        "file": "Graphics/3_12_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_12_3.md",
+        "file": "Graphics/3_12_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.13",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_13_1.md",
+        "file": "Graphics/3_13_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_13_2.md",
+        "file": "Graphics/3_13_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_13_3.md",
+        "file": "Graphics/3_13_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.14",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_14_1.md",
+        "file": "Graphics/3_14_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_14_2.md",
+        "file": "Graphics/3_14_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_14_3.md",
+        "file": "Graphics/3_14_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.15",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_15_1.md",
+        "file": "Graphics/3_15_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_15_2.md",
+        "file": "Graphics/3_15_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_15_3.md",
+        "file": "Graphics/3_15_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.16",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_16_1.md",
+        "file": "Graphics/3_16_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_16_2.md",
+        "file": "Graphics/3_16_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_16_3.md",
+        "file": "Graphics/3_16_3.glb"
+      }
+    ]
+  },
+  {
+    "chapter": "Chapter 3.17",
+    "steps": [
+      {
+        
+        "desc_file": "Descriptions/3_17_1.md",
+        "file": "Graphics/3_17_1.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_17_2.md",
+        "file": "Graphics/3_17_2.glb"
+      },
+      {
+        
+        "desc_file": "Descriptions/3_17_3.md",
+        "file": "Graphics/3_17_3.glb"
+      }
+    ]
   }
 ]
